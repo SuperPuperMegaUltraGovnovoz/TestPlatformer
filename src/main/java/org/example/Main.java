@@ -15,9 +15,9 @@ public class Main {
 
         Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
         Object[] object = new Object[3];
-        object[0] = new Object((int)world.x(), (int)world.y() - 105, 40 * 3, 20 * 1);
+        object[0] = new Object((int)world.x() + 300, (int)world.y() - 50, 40 * 3, 20 * 1);
         object[1] = new Object((int)world.x(), (int)world.y(), 40 * 3, 40 * 1);
-        object[2] = new Object((int)world.x() + 120, (int)world.y() - 80, 40 * 3, 20 * 4);
+        object[2] = new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 3, 20 * 1);
 
         Camera2D camera = new Camera2D();
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
@@ -45,7 +45,7 @@ public class Main {
             Collision.collision(player, object[i]);}
 
             if(!player.onFloor){
-                velosityY = velosityY - 0.01f * GetFrameTime() * 50; velosityY = Math.max(velosityY, -0.4f);
+                velosityY = velosityY - 0.0095f * GetFrameTime() * 50; velosityY = Math.max(velosityY, -0.4f);
                 camera.target().y(camera.target().y() + (-velosityY) * GetFrameTime() * 500);
             }
 
@@ -57,8 +57,8 @@ public class Main {
             }
 
             if(player.onFloor) {
-                velosityY = 0.2f;
-                if (IsKeyDown(KEY_W)) {
+                velosityY = 0.4f;
+                if (IsKeyDown(KEY_SPACE)) {
                     camera.target().y(camera.target().y() + (-velosityY) * GetFrameTime() * 500);
                 }
             }
