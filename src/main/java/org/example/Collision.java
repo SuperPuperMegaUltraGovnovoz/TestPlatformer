@@ -10,7 +10,7 @@ public class Collision {
 
     static void collision(Player player, Object object){
         if(!player.onFloor) {
-            if (object.y >= player.y + player.height && object.y - 1 <= player.y + player.height) {
+            if (object.y <= player.y + player.height && object.y + 5 >= player.y + player.height) {
                 if (object.x < player.x + player.width && object.x + object.width > player.x - player.width) {
                     player.onFloor = true;
                 }
@@ -18,8 +18,7 @@ public class Collision {
         }
 
         if(!player.CollisionWithUp) {
-            //if (object.y >= player.y && object.y + 1 <= player.y) {
-            if (object.y + object.height <= player.y - player.height && object.y + object.height + 1 >= player.y - player.height) {
+            if (object.y + object.height <= player.y - player.height && object.y + object.height + 5 >= player.y - player.height) {
                 if (object.x < player.x + player.width && object.x + object.width > player.x - player.width) {
                     player.CollisionWithUp = true;
                 }
