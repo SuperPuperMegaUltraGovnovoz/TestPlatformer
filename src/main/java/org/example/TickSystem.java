@@ -12,7 +12,8 @@ public class TickSystem {
         timer += GetFrameTime();
 
         if(timer >= delta){
-            Game.update();
+            if (Animation.endAnim){
+            Game.update();}
             timer -= delta;
         }
     }

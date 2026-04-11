@@ -10,7 +10,7 @@ public class Game {
     static Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
     static Object[] object = new Object[3];
     static Camera2D camera = new Camera2D();
-    static Player player = new Player((int) camera.target().x(), (int) camera.target().y() - 400, 30 * 1, 40 * 1);
+    static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 400 * 2, 30 * 2, 40 * 2);
     static int tgFPS = 60;
     static float velosityX = 0f;
     static float velosityX1 = 0f;
@@ -19,14 +19,14 @@ public class Game {
     static final float multVelosity = 500;
 
     public static void init(){
-        object[0] = new Object((int)world.x() + 330, (int)world.y() - 50, 40 * 3, 20 * 1);
-        object[1] = new Object((int)world.x(), (int)world.y(), 40 * 3, 40 * 1);
-        object[2] = new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 3, 20 * 1);
+        object[0] = new Object((int)world.x() + 330, (int)world.y() - 50 * 2, 40 * 3 * 2, 20 * 1 * 2);
+        object[1] = new Object((int)world.x(), (int)world.y() + 50, 40 * 3 * 2, 40 * 2);
+        object[2] = new Object((int)world.x() + 125 * 2, (int)world.y() - 50, 40 * 3 * 2, 20 * 1 * 2);
 
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
         camera.offset(new Vector2().x(Main.screenWidth1/2).y(Main.screenHeight1/2));
         camera.rotation(0.0f);
-        camera.zoom(1.0f);
+        camera.zoom(0.5f);
     }
 
     public static void update() {
@@ -100,11 +100,13 @@ public class Game {
 
     public static void render(){
 
-        //применение координат и изминение зума
+        //применение координат и изменение зума
         player.x = (int) camera.target().x();
         player.y = (int) camera.target().y();
         camera.zoom((camera.zoom()) + (GetMouseWheelMove() * 0.03f));
         camera.zoom(Math.max(camera.zoom(), 0.02f));
+        if(IsKeyDown(KEY_R)){Animation.y = 0; Animation.x = 0; Animation.endAnim = false;}
+        if(!Animation.endAnim){Animation.animation();}
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
