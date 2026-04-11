@@ -10,7 +10,7 @@ public class Game {
     static Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
     static Object[] object = new Object[3];
     static Camera2D camera = new Camera2D();
-    static Player player = new Player((int) camera.target().x(), (int) camera.target().y() - 400, 30 * 1, 40 * 1, false);
+    static Player player = new Player((int) camera.target().x(), (int) camera.target().y() - 400, 30 * 1, 40 * 1);
     static int tgFPS = 60;
     static float velosityX = 0f;
     static float velosityX1 = 0f;
