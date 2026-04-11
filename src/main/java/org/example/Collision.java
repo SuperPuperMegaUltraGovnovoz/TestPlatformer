@@ -35,7 +35,7 @@ public class Collision {
 
         if(!player.CollisionWithLeft) {
             if (object.y <= player.y + player.height && object.y + object.height >= player.y - player.height) {
-                if (object.x + object.width == player.x - player.width) {
+                if (object.x + object.width <= player.x - player.width && object.x + object.width + 1 >= player.x - player.width) {
                     player.CollisionWithLeft = true;
                 }
             }
