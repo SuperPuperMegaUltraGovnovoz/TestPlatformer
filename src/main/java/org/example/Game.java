@@ -8,7 +8,7 @@ import static com.raylib.Raylib.*;
 public class Game {
 
     static Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
-    static Object[] object = new Object[3];
+    static Object[] object = new Object[4];
     static Camera2D camera = new Camera2D();
     static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 400 * 2, 30 * 2, 40 * 2);
     static int tgFPS = 60;
@@ -19,9 +19,10 @@ public class Game {
     static final float multVelosity = 500;
 
     public static void init(){
-        object[0] = new Object((int)world.x() + 330, (int)world.y() - 50 * 2, 40 * 3 * 2, 20 * 1 * 2);
-        object[1] = new Object((int)world.x(), (int)world.y() + 50, 40 * 3 * 2, 40 * 2);
-        object[2] = new Object((int)world.x() + 125 * 2, (int)world.y() - 50, 40 * 3 * 2, 20 * 1 * 2);
+        object[0] = new Object((int)world.x() + 330, (int)world.y() - 100, 40 * 6, 20 * 2);
+        object[1] = new Object((int)world.x(), (int)world.y() + 50, 10000, 40 * 2);
+        object[2] = new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 6, 20 * 2);
+        object[3] = new Object((int)world.x() + 125 + 330, (int)world.y() - 50, 40 * 6, 20 * 2);
 
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
         camera.offset(new Vector2().x(Main.screenWidth1/2).y(Main.screenHeight1/2));
@@ -51,7 +52,7 @@ public class Game {
 
         //гравитация
         if (!player.onFloor) {
-            velosityY = velosityY - 0.001f * TickSystem.delta * multVelosity;
+            velosityY = velosityY - 0.0015f * TickSystem.delta * multVelosity;
             velosityY = Math.max(velosityY, -0.4f);
             camera.target().y(camera.target().y() + (-velosityY) * TickSystem.delta * multVelosity);
         }
@@ -64,7 +65,7 @@ public class Game {
 
         if (player.onFloor) {
             if (IsKeyDown(KEY_SPACE)) {
-                velosityY = 0.5f;
+                velosityY = 0.6f;
                 camera.target().y(camera.target().y() + (-velosityY) * TickSystem.delta * multVelosity);
             }
         }
@@ -73,7 +74,7 @@ public class Game {
             if (player.onFloor) {
                 velosityY1 = 0;
             } else {
-                velosityY1 = 0.2f;
+                velosityY1 = 0.3f;
             }
             camera.target().y(camera.target().y() + velosityY1 * TickSystem.delta * multVelosity);
         }
@@ -82,7 +83,7 @@ public class Game {
             if (player.CollisionWithLeft) {
                 velosityX = 0;
             } else {
-                velosityX = 0.2f;
+                velosityX = 0.3f;
             }
             camera.target().x(camera.target().x() + (-velosityX) * TickSystem.delta * multVelosity);
         }
@@ -92,7 +93,7 @@ public class Game {
             if (player.CollisionWithRight) {
                 velosityX1 = 0;
             } else {
-                velosityX1 = 0.2f;
+                velosityX1 = 0.3f;
             }
             camera.target().x(camera.target().x() + velosityX1 * TickSystem.delta * multVelosity);
         }
