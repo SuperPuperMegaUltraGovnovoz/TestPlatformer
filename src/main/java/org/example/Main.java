@@ -15,8 +15,8 @@ public class Main {
         Game.init();
 
         while (!WindowShouldClose()) {
-            TickSystem.Tick();
             Game.render();
+            TickSystem.Tick();
         }
         CloseWindow();
     }
