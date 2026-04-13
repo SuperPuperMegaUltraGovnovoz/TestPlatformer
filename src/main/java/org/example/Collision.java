@@ -1,5 +1,7 @@
 package org.example;
 
+import static com.raylib.Raylib.*;
+
 public class Collision {
     static void disCollision(Player player){
         player.CollisionWithUp = false;
@@ -8,37 +10,41 @@ public class Collision {
         player.onFloor = false;
     }
 
-    static void collision(Player player, Object object){
-        if(!player.onFloor) {
-            if (object.y <= player.y + player.height && object.y + 5 >= player.y + player.height) {
-                if (object.x < player.x + player.width && object.x + object.width > player.x - player.width) {
-                    player.onFloor = true;
-                }
-            }
-        }
+    public static boolean collision(Rectangle box1, Rectangle box2){
+        boolean colision = CheckCollisionRecs(box1, box2);
 
-        if(!player.CollisionWithUp) {
-            if (object.y + object.height <= player.y - player.height && object.y + object.height + 5 >= player.y - player.height) {
-                if (object.x < player.x + player.width && object.x + object.width > player.x - player.width) {
-                    player.CollisionWithUp = true;
-                }
-            }
-        }
+        return colision;
+    }
 
-        if(!player.CollisionWithRight) {
-            if (object.y <= player.y + player.height && object.y + object.height >= player.y - player.height) {
-                if (object.x <= player.x + player.width && object.x + 1 >= player.x + player.width) {
-                    player.CollisionWithRight = true;
-                }
-            }
+    public static void collisionU(Player player, Object object){
+        Rectangle box1 = new Rectangle().x(player.position.x() - player.size.x()).y(player.position.y() - player.size.y() - 0.6f * TickSystem.delta * Game.multVelosity).width(player.size.x() * 2).height(player.size.y());
+        Rectangle box2 = new Rectangle().x(object.position.x()).y(object.position.y()).width(object.size.x()).height(object.size.y());
+        if(collision(box1, box2)){
+            player.CollisionWithUp = true;
         }
+    }
 
-        if(!player.CollisionWithLeft) {
-            if (object.y <= player.y + player.height && object.y + object.height >= player.y - player.height) {
-                if (object.x + object.width <= player.x - player.width && object.x + object.width + 1 >= player.x - player.width) {
-                    player.CollisionWithLeft = true;
-                }
-            }
+    public static void collisionD(Player player, Object object){
+        Rectangle box1 = new Rectangle().x(player.position.x() - player.size.x()).y(player.position.y() + 0.4f * TickSystem.delta * Game.multVelosity).width(player.size.x() * 2).height(player.size.y());
+        Rectangle box2 = new Rectangle().x(object.position.x()).y(object.position.y()).width(object.size.x()).height(object.size.y());
+        if(collision(box1, box2)){
+            player.onFloor = true;
+        }
+    }
+
+    public static void collisionR(Player player, Object object){
+        Rectangle box1 = new Rectangle().x(player.position.x() + 0.3f * TickSystem.delta * Game.multVelosity).y(player.position.y() - player.size.y() - 0.4f * TickSystem.delta * Game.multVelosity).width(player.size.x()).height(player.size.y() * 2);
+        Rectangle box2 = new Rectangle().x(object.position.x()).y(object.position.y()).width(object.size.x()).height(object.size.y());
+        if(collision(box1, box2)){
+            player.CollisionWithRight = true;
+        }
+    }
+
+    public static void collisionL(Player player, Object object){
+        Rectangle box1 = new Rectangle().x(player.position.x() - player.size.x() - 0.3f * TickSystem.delta * Game.multVelosity).y(player.position.y() - player.size.y() - 0.4f * TickSystem.delta * Game.multVelosity).width(player.size.x()).height(player.size.y() * 2);
+        Rectangle box2 = new Rectangle().x(object.position.x()).y(object.position.y()).width(object.size.x()).height(object.size.y());
+        if(collision(box1, box2)){
+            player.CollisionWithLeft = true;
         }
     }
 }

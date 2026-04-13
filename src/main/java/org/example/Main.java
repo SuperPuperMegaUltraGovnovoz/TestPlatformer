@@ -17,6 +17,7 @@ public class Main {
         while (!WindowShouldClose()) {
             TickSystem.Tick();
             Game.render();
+            if(!Animation.endAnim){Animation.animation();}
         }
         CloseWindow();
     }
