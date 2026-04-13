@@ -8,15 +8,15 @@ public class Animation {
     public static int x = 0;
 
     public static void animation(){
-        Game.player.width = y;
-        Game.player.height = x;
+        Game.player.size.x(x);
+        Game.player.size.y(y);
 
-        if(y != 30 * 2){
+        if(y != 40 * 2){
             y += 1;
         }
-        if(x != 40 * 2){
+        if(x != 30 * 2){
             x += 1;
         }
-        if(x == 40 * 2 && y == 30 * 2){endAnim = true;}
+        if(x == 30 * 2 && y == 40 * 2){endAnim = true;}
     }
 }

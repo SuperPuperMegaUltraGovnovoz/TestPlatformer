@@ -8,21 +8,19 @@ import static com.raylib.Raylib.*;
 public class Game {
 
     static Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
-    static Object[] object = new Object[4];
+    static Object[] object = new Object[5];
     static Camera2D camera = new Camera2D();
-    static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 400 * 2, 30 * 2, 40 * 2);
+    static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 500 * 2, 30 * 2, 40 * 2);
     static int tgFPS = 60;
-    static float velosityX = 0f;
-    static float velosityX1 = 0f;
-    static float velosityY = 0f;
-    static float velosityY1 = 0f;
     static final float multVelosity = 500;
+    static final Vector2 velosity = new Vector2().x(0).y(0);
 
     public static void init(){
         object[0] = new Object((int)world.x() + 330, (int)world.y() - 100, 40 * 6, 20 * 2);
-        object[1] = new Object((int)world.x(), (int)world.y() + 50, 10000, 40 * 2);
+        object[1] = new Object((int)world.x() - 500, (int)world.y() + 50, 2000, 40 * 2);
         object[2] = new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 6, 20 * 2);
         object[3] = new Object((int)world.x() + 125 + 330, (int)world.y() - 50, 40 * 6, 20 * 2);
+        object[4] = new Object((int)world.x() + 330, (int)world.y() - 320, 40 * 6, 20 * 2);
 
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
         camera.offset(new Vector2().x(Main.screenWidth1/2).y(Main.screenHeight1/2));
@@ -33,7 +31,7 @@ public class Game {
     public static void update() {
         //обнуление колизий
         Collision.disCollision(player);
-        //фпс
+//        фпс
         SetTargetFPS(tgFPS);
         if (IsKeyDown(KEY_ONE)) {
             tgFPS = -1;
@@ -47,78 +45,84 @@ public class Game {
 
         //столкновение
         for (int i = 0; i < object.length; i++) {
-            Collision.collision(player, object[i]);
+            Collision.collisionU(player, object[i]);
+            Collision.collisionD(player, object[i]);
+            Collision.collisionR(player, object[i]);
+            Collision.collisionL(player, object[i]);
         }
 
         //гравитация
         if (!player.onFloor) {
-            velosityY = velosityY - 0.0015f * TickSystem.delta * multVelosity;
-            velosityY = Math.max(velosityY, -0.4f);
-            camera.target().y(camera.target().y() + (-velosityY) * TickSystem.delta * multVelosity);
+            velosity.y(velosity.y() - 0.0015f * TickSystem.delta * multVelosity);
+            velosity.y(Math.max(velosity.y(), -0.4f));
+            camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
         }
         //взаимодействие с колизией
-        if (player.CollisionWithUp) {
-            if (velosityY >= 0) {
-                velosityY = 0f;
-            }
+
+        if (velosity.y() >= 0 && player.CollisionWithUp) {
+            velosity.y(0f);
         }
 
-        if (player.onFloor) {
-            if (IsKeyDown(KEY_SPACE)) {
-                velosityY = 0.6f;
-                camera.target().y(camera.target().y() + (-velosityY) * TickSystem.delta * multVelosity);
-            }
+
+
+        if (IsKeyDown(KEY_SPACE) && player.onFloor) {
+            velosity.y( 0.6f);
+            camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
         }
+
 
         if (IsKeyDown(KEY_S)) {
             if (player.onFloor) {
-                velosityY1 = 0;
+                velosity.y(0);
             } else {
-                velosityY1 = 0.3f;
+                velosity.y(-0.4f);
             }
-            camera.target().y(camera.target().y() + velosityY1 * TickSystem.delta * multVelosity);
+            camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
         }
 
         if (IsKeyDown(KEY_A)) {
             if (player.CollisionWithLeft) {
-                velosityX = 0;
+                velosity.x(0);
             } else {
-                velosityX = 0.3f;
+                velosity.x(0.3f);
             }
-            camera.target().x(camera.target().x() + (-velosityX) * TickSystem.delta * multVelosity);
+            camera.target().x(camera.target().x() - velosity.x() * TickSystem.delta * multVelosity);
         }
 
 
         if (IsKeyDown(KEY_D)) {
             if (player.CollisionWithRight) {
-                velosityX1 = 0;
+                velosity.x(0);
             } else {
-                velosityX1 = 0.3f;
+                velosity.x(0.3f);
             }
-            camera.target().x(camera.target().x() + velosityX1 * TickSystem.delta * multVelosity);
+            camera.target().x(camera.target().x() + velosity.x() * TickSystem.delta * multVelosity);
         }
+
+        player.position.x(camera.target().x());
+        player.position.y(camera.target().y());
     }
 
     public static void render(){
 
-        //применение координат и изменение зума
-        player.x = (int) camera.target().x();
-        player.y = (int) camera.target().y();
+        if (IsKeyDown(KEY_R)){Animation.endAnim = false;Animation.y = 0; Animation.x = 0;}
+
+        //изменение зума
         camera.zoom((camera.zoom()) + (GetMouseWheelMove() * 0.03f));
         camera.zoom(Math.max(camera.zoom(), 0.02f));
-        if(IsKeyDown(KEY_R)){Animation.y = 0; Animation.x = 0; Animation.endAnim = false;}
-        if(!Animation.endAnim){Animation.animation();}
+//        if(IsKeyDown(KEY_R)){Animation.y = 0; Animation.x = 0; Animation.endAnim = false;}
+//        if(!Animation.endAnim){Animation.animation();}
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
         BeginMode2D(camera);
         //отрисовка
         for (int i = 0; i < object.length; i++) {
-            DrawRectangle(object[i].x, object[i].y, object[i].width, object[i].height, VIOLET);
-            DrawRectangleLines(object[i].x, object[i].y, object[i].width, object[i].height, player.onFloor || player.CollisionWithUp ? GREEN : RED);
+            DrawRectangle((int)object[i].position.x(), (int)object[i].position.y(), (int)object[i].size.x(), (int)object[i].size.y(), VIOLET);
+            DrawRectangleLines((int)object[i].position.x(), (int)object[i].position.y(), (int)object[i].size.x(), (int)object[i].size.y(), player.onFloor || player.CollisionWithUp ? GREEN : RED);
         }
 
-        DrawEllipse(player.x, player.y, player.width, player.height, RED);
+        DrawEllipse((int)player.position.x(), (int)player.position.y(), player.size.x(), player.size.y(), RED);
 
         EndMode2D();
         //разного рода статистики и показатели
@@ -127,7 +131,12 @@ public class Game {
         DrawText("onFloor " + player.onFloor, 20, 60, 20, RED);
         DrawText("CollisionWithUp " + player.CollisionWithUp, 20, 80, 20, RED);DrawText("CollisionWithR " + player.CollisionWithRight, 20, 100, 20, RED);
         DrawText("CollisionWithL " + player.CollisionWithLeft, 20, 120, 20, RED);
-        DrawText("Speed " + ((velosityY + velosityY1 + velosityX1 + velosityX) / 4), 20, 140, 20, GREEN);
+        DrawText("Speed " + ((velosity.x() + velosity.y()) / 2), 20, 140, 20, GREEN);
+
+        if(IsKeyDown(KEY_SPACE)){DrawText("Up", 20, 160, 20, SKYBLUE);}
+        if(IsKeyDown(KEY_A)){DrawText("A", 40, 160, 20, SKYBLUE);}
+        if(IsKeyDown(KEY_D)){DrawText("D", 60, 160, 20, SKYBLUE);}
+        if(IsKeyDown(KEY_S)){DrawText("S", 80, 160, 20, SKYBLUE);}
         EndDrawing();
     }
 }
