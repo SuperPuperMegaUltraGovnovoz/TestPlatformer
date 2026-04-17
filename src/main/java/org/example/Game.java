@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.ArrayList;
+
 import static com.raylib.Colors.*;
 import static com.raylib.Colors.GREEN;
 import static com.raylib.Colors.RED;
@@ -8,7 +10,7 @@ import static com.raylib.Raylib.*;
 public class Game {
 
     static Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
-    static Object[] object = new Object[5];
+    static ArrayList<Object> object = new ArrayList<>(5);
     static Camera2D camera = new Camera2D();
     static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 500 * 2, 30 * 2, 40 * 2);
     static int tgFPS = 60;
@@ -16,20 +18,20 @@ public class Game {
     static final Vector2 velosity = new Vector2().x(0).y(0);
 
     public static void init(){
-        object[0] = new Object((int)world.x() + 330, (int)world.y() - 100, 40 * 6, 20 * 2);
-        object[1] = new Object((int)world.x() - 500, (int)world.y() + 50, 2000, 40 * 2);
-        object[2] = new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 6, 20 * 2);
-        object[3] = new Object((int)world.x() + 125 + 330, (int)world.y() - 50, 40 * 6, 20 * 2);
-        object[4] = new Object((int)world.x() + 330, (int)world.y() - 320, 40 * 6, 20 * 2);
+        object.add(new Object((int)world.x() + 330, (int)world.y() - 100, 40 * 6, 20 * 2));
+        object.add(new Object((int)world.x() - 500, (int)world.y() + 50, 2000, 40 * 2));
+        object.add(new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 6, 20 * 2));
+        object.add(new Object((int)world.x() + 125 + 330, (int)world.y() - 50, 40 * 6, 20 * 2));
+        object.add(new Object((int)world.x() + 330, (int)world.y() - 320, 40 * 6, 20 * 2));
 
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
-        camera.offset(new Vector2().x(Main.screenWidth1/2).y(Main.screenHeight1/2));
+        camera.offset(new Vector2().x(Main.screenWidth /2).y(Main.screenHeight /2));
         camera.rotation(0.0f);
         camera.zoom(0.5f);
     }
 
     public static void update() {
-        //обнуление колизий
+        //обнуление коллизий
         Collision.disCollision(player);
 //        фпс
         SetTargetFPS(tgFPS);
@@ -44,11 +46,11 @@ public class Game {
         }
 
         //столкновение
-        for (int i = 0; i < object.length; i++) {
-            Collision.collisionU(player, object[i]);
-            Collision.collisionD(player, object[i]);
-            Collision.collisionR(player, object[i]);
-            Collision.collisionL(player, object[i]);
+        for (Object value : object) {
+            Collision.collisionU(player, value);
+            Collision.collisionD(player, value);
+            Collision.collisionR(player, value);
+            Collision.collisionL(player, value);
         }
 
         //гравитация
@@ -57,7 +59,7 @@ public class Game {
             velosity.y(Math.max(velosity.y(), -0.4f));
             camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
         }
-        //взаимодействие с колизией
+        //взаимодействие с коллизией
 
         if (velosity.y() >= 0 && player.CollisionWithUp) {
             velosity.y(0f);
@@ -84,7 +86,7 @@ public class Game {
             if (player.CollisionWithLeft) {
                 velosity.x(0);
             } else {
-                velosity.x(0.3f);
+                velosity.x(0.6f);
             }
             camera.target().x(camera.target().x() - velosity.x() * TickSystem.delta * multVelosity);
         }
@@ -94,7 +96,7 @@ public class Game {
             if (player.CollisionWithRight) {
                 velosity.x(0);
             } else {
-                velosity.x(0.3f);
+                velosity.x(0.6f);
             }
             camera.target().x(camera.target().x() + velosity.x() * TickSystem.delta * multVelosity);
         }
@@ -105,21 +107,19 @@ public class Game {
 
     public static void render(){
 
-        if (IsKeyDown(KEY_R)){Animation.endAnim = false;Animation.y = 0; Animation.x = 0;}
-
         //изменение зума
         camera.zoom((camera.zoom()) + (GetMouseWheelMove() * 0.03f));
         camera.zoom(Math.max(camera.zoom(), 0.02f));
-//        if(IsKeyDown(KEY_R)){Animation.y = 0; Animation.x = 0; Animation.endAnim = false;}
-//        if(!Animation.endAnim){Animation.animation();}
+        if(IsKeyDown(KEY_R)){Animation.y = 0; Animation.x = 0; Animation.endAnim = false;}
+        if(!Animation.endAnim){Animation.animation();}
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
         BeginMode2D(camera);
         //отрисовка
-        for (int i = 0; i < object.length; i++) {
-            DrawRectangle((int)object[i].position.x(), (int)object[i].position.y(), (int)object[i].size.x(), (int)object[i].size.y(), VIOLET);
-            DrawRectangleLines((int)object[i].position.x(), (int)object[i].position.y(), (int)object[i].size.x(), (int)object[i].size.y(), player.onFloor || player.CollisionWithUp ? GREEN : RED);
+        for (Object object1 : object) {
+            DrawRectangle((int) object1.position.x(), (int) object1.position.y(), (int) object1.size.x(), (int) object1.size.y(), VIOLET);
+            DrawRectangleLines((int) object1.position.x(), (int) object1.position.y(), (int) object1.size.x(), (int) object1.size.y(), player.onFloor || player.CollisionWithUp ? GREEN : RED);
         }
 
         DrawEllipse((int)player.position.x(), (int)player.position.y(), player.size.x(), player.size.y(), RED);
