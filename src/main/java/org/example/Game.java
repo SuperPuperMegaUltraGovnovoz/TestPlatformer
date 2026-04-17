@@ -25,7 +25,7 @@ public class Game {
         object.add(new Object((int)world.x() + 330, (int)world.y() - 320, 40 * 6, 20 * 2));
 
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
-        camera.offset(new Vector2().x(Main.screenWidth1/2).y(Main.screenHeight1/2));
+        camera.offset(new Vector2().x(Main.screenWidth /2).y(Main.screenHeight /2));
         camera.rotation(0.0f);
         camera.zoom(0.5f);
     }
