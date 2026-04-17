@@ -86,7 +86,7 @@ public class Game {
             if (player.CollisionWithLeft) {
                 velosity.x(0);
             } else {
-                velosity.x(0.3f);
+                velosity.x(0.6f);
             }
             camera.target().x(camera.target().x() - velosity.x() * TickSystem.delta * multVelosity);
         }
@@ -96,7 +96,7 @@ public class Game {
             if (player.CollisionWithRight) {
                 velosity.x(0);
             } else {
-                velosity.x(0.3f);
+                velosity.x(0.6f);
             }
             camera.target().x(camera.target().x() + velosity.x() * TickSystem.delta * multVelosity);
         }

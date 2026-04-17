@@ -12,6 +12,11 @@ public class Main {
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         InitWindow((int)screenWidth1, (int)screenHeight1, "Demo");
 
+        int[] sc = new int[2]; sc[0] = 0; sc[1] = 1;
+
+        Scene scenes = new Scene(sc);
+        Scene scene = new Scene(0);
+
         Game.init();
 
         while (!WindowShouldClose()) {
