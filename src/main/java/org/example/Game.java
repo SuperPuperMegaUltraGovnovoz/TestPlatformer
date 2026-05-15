@@ -1,42 +1,75 @@
 package org.example;
 
+import com.raylib.Raylib;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.raylib.Colors.*;
-import static com.raylib.Colors.GREEN;
-import static com.raylib.Colors.RED;
 import static com.raylib.Raylib.*;
+import static org.example.Main.debagMode;
 
 public class Game {
 
+    static Texture texture;
     static Rectangle world = new Rectangle().x(300).y(300).width(40).height(40);
     static ArrayList<Object> object = new ArrayList<>(5);
+    static Ladder lader = new Ladder((int)world.x() + 1000, (int)world.y() + 50, 2000, 40 * 2, 45);
     static Camera2D camera = new Camera2D();
-    static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 500 * 2, 30 * 2, 40 * 2);
+    static Player player = new Player((int) camera.target().x() + 50, (int) camera.target().y() - 500 * 2, 40, 80, texture, true);
     static int tgFPS = 60;
-    static final float multVelosity = 500;
-    static final Vector2 velosity = new Vector2().x(0).y(0);
+    static final float multVelocity = 500;
+    static final Vector2 velocity = new Vector2().x(0).y(0);
+    static private final float vSpeed = 0.8f;
+    static Animation walk = new Animation(true, 15, true);
+    static public HashMap<String, ArrayList<Object>> grid = new HashMap<>();
+    static final int GRID_SIZE = 150;
 
     public static void init(){
         object.add(new Object((int)world.x() + 330, (int)world.y() - 100, 40 * 6, 20 * 2));
         object.add(new Object((int)world.x() - 500, (int)world.y() + 50, 2000, 40 * 2));
         object.add(new Object((int)world.x() + 125, (int)world.y() - 50, 40 * 6, 20 * 2));
         object.add(new Object((int)world.x() + 125 + 330, (int)world.y() - 50, 40 * 6, 20 * 2));
-        object.add(new Object((int)world.x() + 330, (int)world.y() - 320, 40 * 6, 20 * 2));
+        object.add(new Object((int)world.x() + 330 , (int)world.y() - 320, 40 * 6, 20 * 2));
 
         camera.target(new Vector2().x(world.x() + 60).y(world.y() - 60));
         camera.offset(new Vector2().x(Main.screenWidth /2).y(Main.screenHeight /2));
         camera.rotation(0.0f);
         camera.zoom(0.5f);
+
+        walk.textures = new ArrayList<> (2);
+        walk.textures.add(LoadTexture(ResourceManager.getTexturePath("PlayerStay.png")));
+        walk.textures.add(LoadTexture(ResourceManager.getTexturePath("PlayerWalk1.png")));
+        walk.textures.add(LoadTexture(ResourceManager.getTexturePath("PlayerWalk2.png")));
+        walk.textures.add(LoadTexture(ResourceManager.getTexturePath("PlayerWalk3.png")));
+
+        player.texture = walk.textures.get(0);
+        createGrid();
+    }
+
+    public static void createGrid(){
+        grid.clear();
+        for(Object object1 : object){
+            int SgridX = (int)Math.floor(object1.position.x() / GRID_SIZE);
+            int SgridY = (int)Math.floor(object1.position.y() / GRID_SIZE);
+            int EgridX = (int)Math.floor((object1.position.x() + object1.size.x()) / GRID_SIZE);
+            int EgridY = (int)Math.floor((object1.position.y() + object1.size.y()) / GRID_SIZE);
+            for(int X = SgridX; X <= EgridX; X++) {
+                for (int Y = SgridY; Y <= EgridY; Y++) {
+                    String key = X + ", " + Y;
+                    grid.computeIfAbsent(key, k -> new ArrayList<>()).add(object1);
+                }
+            }
+        }
     }
 
     public static void update() {
         //обнуление коллизий
         Collision.disCollision(player);
-//        фпс
+        //фпс
         SetTargetFPS(tgFPS);
         if (IsKeyDown(KEY_ONE)) {
-            tgFPS = -1;
+            tgFPS = 0;
         }
         if (IsKeyDown(KEY_TWO)) {
             tgFPS = 60;
@@ -46,59 +79,70 @@ public class Game {
         }
 
         //столкновение
-        for (Object value : object) {
-            Collision.collisionU(player, value);
-            Collision.collisionD(player, value);
-            Collision.collisionR(player, value);
-            Collision.collisionL(player, value);
-        }
+        Collision.checkCollision();
 
         //гравитация
         if (!player.onFloor) {
-            velosity.y(velosity.y() - 0.0015f * TickSystem.delta * multVelosity);
-            velosity.y(Math.max(velosity.y(), -0.4f));
-            camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
+            velocity.y(velocity.y() - 0.0025f * TickSystem.delta * multVelocity);
+            velocity.y(Math.max(velocity.y(), -0.8f));
+            camera.target().y(camera.target().y() - velocity.y() * TickSystem.delta * multVelocity);
         }
+
         //взаимодействие с коллизией
-
-        if (velosity.y() >= 0 && player.CollisionWithUp) {
-            velosity.y(0f);
+        if (velocity.y() >= 0 && player.CollisionWithUp) {
+            velocity.y(0f);
         }
 
 
 
-        if (IsKeyDown(KEY_SPACE) && player.onFloor) {
-            velosity.y( 0.6f);
-            camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
-        }
+        if (IsKeyDown(KEY_SPACE)) {
+            velocity.y(vSpeed);
+            camera.target().y(camera.target().y() - velocity.y() * TickSystem.delta * multVelocity);
+        }else if(player.onFloor && !IsKeyDown(KEY_SPACE)){
+            velocity.y(0);}
 
 
         if (IsKeyDown(KEY_S)) {
             if (player.onFloor) {
-                velosity.y(0);
+                velocity.y(0);
             } else {
-                velosity.y(-0.4f);
+                velocity.y(-vSpeed);
             }
-            camera.target().y(camera.target().y() - velosity.y() * TickSystem.delta * multVelosity);
+            camera.target().y(camera.target().y() - velocity.y() * TickSystem.delta * multVelocity);
         }
 
-        if (IsKeyDown(KEY_A)) {
+        if (IsKeyDown(KEY_A) && !IsKeyDown(KEY_D)) {
             if (player.CollisionWithLeft) {
-                velosity.x(0);
+                velocity.x(0);
+                walk.stop();
             } else {
-                velosity.x(0.6f);
+                velocity.x(vSpeed);
+                if(!walk.animPlay){
+                    walk.play();}
+                walk.Animator();
             }
-            camera.target().x(camera.target().x() - velosity.x() * TickSystem.delta * multVelosity);
+            player.facingRight = false;
+            camera.target().x(camera.target().x() - velocity.x() * TickSystem.delta * multVelocity);
         }
 
 
-        if (IsKeyDown(KEY_D)) {
+        if (IsKeyDown(KEY_D) && !IsKeyDown(KEY_A)) {
             if (player.CollisionWithRight) {
-                velosity.x(0);
+                velocity.x(0);
+                walk.stop();
             } else {
-                velosity.x(0.6f);
+                velocity.x(vSpeed);
+                if(!walk.animPlay){
+                walk.play();}
+                walk.Animator();
             }
-            camera.target().x(camera.target().x() + velosity.x() * TickSystem.delta * multVelosity);
+            player.facingRight = true;
+            camera.target().x(camera.target().x() + velocity.x() * TickSystem.delta * multVelocity);
+        }
+
+        if (!IsKeyDown(KEY_A) && !IsKeyDown(KEY_D)) {
+            walk.stop();
+            player.texture = walk.textures.get(0);
         }
 
         player.position.x(camera.target().x());
@@ -106,37 +150,40 @@ public class Game {
     }
 
     public static void render(){
+        Raylib.Vector2 origin;
+        Raylib.Rectangle dest;
+        Raylib.Rectangle source;
+
+        source = new Raylib.Rectangle().x(0).y(0).width(player.facingRight ? 36 : -36).height(88);
+        dest = new Raylib.Rectangle().x(player.position.x() - player.size.x()).y(player.position.y() - player.size.y()).width(player.size.x() * 2f).height(player.size.y() * 2f);
+        origin = new Raylib.Vector2().x(0).y(0);
 
         //изменение зума
+        camera.offset(new Vector2().x(Main.screenWidth /2).y(Main.screenHeight /2));
         camera.zoom((camera.zoom()) + (GetMouseWheelMove() * 0.03f));
         camera.zoom(Math.max(camera.zoom(), 0.02f));
-        if(IsKeyDown(KEY_R)){Animation.y = 0; Animation.x = 0; Animation.endAnim = false;}
-        if(!Animation.endAnim){Animation.animation();}
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
         BeginMode2D(camera);
+
         //отрисовка
         for (Object object1 : object) {
             DrawRectangle((int) object1.position.x(), (int) object1.position.y(), (int) object1.size.x(), (int) object1.size.y(), VIOLET);
-            DrawRectangleLines((int) object1.position.x(), (int) object1.position.y(), (int) object1.size.x(), (int) object1.size.y(), player.onFloor || player.CollisionWithUp ? GREEN : RED);
         }
 
-        DrawEllipse((int)player.position.x(), (int)player.position.y(), player.size.x(), player.size.y(), RED);
+        DrawRectanglePro(lader.box2, lader.origin, lader.rotation, VIOLET);
+
+        DrawTexturePro(player.texture, source, dest, origin, 0f, WHITE);
 
         EndMode2D();
-        //разного рода статистики и показатели
-        DrawFPS(20, 20);
-        DrawText("zoom: " + camera.zoom(), 20, 40, 20, RED);
-        DrawText("onFloor " + player.onFloor, 20, 60, 20, RED);
-        DrawText("CollisionWithUp " + player.CollisionWithUp, 20, 80, 20, RED);DrawText("CollisionWithR " + player.CollisionWithRight, 20, 100, 20, RED);
-        DrawText("CollisionWithL " + player.CollisionWithLeft, 20, 120, 20, RED);
-        DrawText("Speed " + ((velosity.x() + velosity.y()) / 2), 20, 140, 20, GREEN);
-
-        if(IsKeyDown(KEY_SPACE)){DrawText("Up", 20, 160, 20, SKYBLUE);}
-        if(IsKeyDown(KEY_A)){DrawText("A", 40, 160, 20, SKYBLUE);}
-        if(IsKeyDown(KEY_D)){DrawText("D", 60, 160, 20, SKYBLUE);}
-        if(IsKeyDown(KEY_S)){DrawText("S", 80, 160, 20, SKYBLUE);}
+        if (debagMode == 1){
+            Debugging.stats();
+        }
+        if(IsKeyPressed(KEY_F3)){
+            if(debagMode == 0){
+                debagMode = 1;}else{debagMode = 0;}
+        }
         EndDrawing();
     }
 }
