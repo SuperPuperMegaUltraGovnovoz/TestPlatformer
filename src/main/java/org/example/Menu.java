@@ -2,6 +2,7 @@ package org.example;
 
 import static com.raylib.Colors.*;
 import static com.raylib.Raylib.*;
+import static org.example.Main.debagMode;
 
 public class Menu {
 
@@ -19,7 +20,7 @@ public class Menu {
             for(Button buttonStart : buttons) {
                 if (Button.isPressed(buttonStart.buttonRect)) {
                     if(buttonStart.nameButton == "Start"){Scene.numScene = 1;}
-                    if(buttonStart.nameButton == "Exit"){Main.winShildClose = true;}
+                    if(buttonStart.nameButton == "Exit"){Main.winShouldClose = true;}
                 }
             }
         }
@@ -28,6 +29,13 @@ public class Menu {
         ClearBackground(RAYWHITE);
         for(Button button : buttons) {
             DrawRectangle((int) button.buttonRect.x(), (int) button.buttonRect.y(), (int) button.buttonRect.width(), (int) button.buttonRect.height(), VIOLET);
+        }
+        if (debagMode == 1){
+            Debugging.stats();
+        }
+        if(IsKeyPressed(KEY_F3)){
+            if(debagMode == 0){
+                debagMode = 1;}else{debagMode = 0;}
         }
         EndDrawing();
     }

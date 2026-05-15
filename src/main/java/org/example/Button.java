@@ -1,7 +1,6 @@
 package org.example;
 
 import com.raylib.Raylib.Rectangle;
-import java.awt.*;
 
 import static com.raylib.Raylib.*;
 

@@ -3,7 +3,7 @@ package org.example;
 import static com.raylib.Raylib.*;
 
 public class TickSystem {
-    public static final int TPS = 45;
+    public static final int TPS = 100;
     public static final float delta = 1f/TPS;
 
     private static float timer;
@@ -11,9 +11,8 @@ public class TickSystem {
     public static void Tick(){
         timer += GetFrameTime();
 
-        if(timer >= delta){
-            if (Animation.endAnim){
-            Game.update();}
+        while(timer >= delta){
+            Game.update();
             timer -= delta;
         }
     }

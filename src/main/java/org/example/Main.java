@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.IOException;
+
 import static com.raylib.Raylib.*;
 
 public class Main {
@@ -7,23 +9,31 @@ public class Main {
     static float screenWidth = 1280;
     static float screenHeight = 720;
 
-    public static boolean winShildClose = false;
+    public static boolean winShouldClose = false;
+
+    static int debagMode = 0;
 
     public static void main(String[] args) {
         //создаём окно
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         InitWindow((int) screenWidth, (int) screenHeight, "Demo");
 
-        int[] sc = new int[2]; sc[0] = 0; sc[1] = 1;
+        int[] sc = new int[2]; sc[1] = 1;
 
+        Scene.scenes = sc;
         Scene.numScene = 0;
-        Scene scenes = new Scene(sc);
+
+        try {
+            ResourceManager.textureExtraction();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
 
         Game.init();
 
-        while (!winShildClose) {
+        while (!winShouldClose) {
             if(WindowShouldClose()){
-                winShildClose = true;
+                winShouldClose = true;
             }
             screenHeight = GetScreenHeight();
             screenWidth = GetScreenWidth();
@@ -35,13 +45,9 @@ public class Main {
                 TickSystem.Tick();
                 Game.render();
             }
-            if(IsKeyPressed(KEY_UP)){
-                Scene.numScene += 1;
-            }
-            if(IsKeyPressed(KEY_DOWN)){
-                Scene.numScene -= 1;
-            }
         }
+        for(Texture texture : Game.walk.textures){
+        UnloadTexture(texture);}
         CloseWindow();
     }
 }
